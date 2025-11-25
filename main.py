@@ -1,12 +1,6 @@
 import sys
 import os
 
-# CRITICAL: Add user site-packages BEFORE any other imports
-# This must happen before streamlit loads to ensure google.generativeai can be found
-explicit_site_package = r"C:\Users\edwar\AppData\Roaming\Python\Python312\site-packages"
-if os.path.exists(explicit_site_package) and explicit_site_package not in sys.path:
-    sys.path.insert(0, explicit_site_package)  # Use insert(0) to prioritize this path
-
 import streamlit as st
 import random
 import time
