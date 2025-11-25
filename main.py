@@ -1,15 +1,10 @@
-import sys
-import os
-
 import streamlit as st
 import random
+import os
 import time
 import base64
-import io
 import re
 from PIL import Image
-import site
-import subprocess
 
 try:
     import google.generativeai as genai
@@ -97,40 +92,32 @@ def local_css(file_name):
 # --- LOGIC ---
 
 def boot_sequence():
-    """Simulates a system boot sequence."""
+    """Simulates a system boot sequence with visual effects."""
     placeholder = st.empty()
     
-    # Step 1: Connecting
     placeholder.markdown('<div class="boot-text-white">CONNECTING TO PLEROMA...</div>', unsafe_allow_html=True)
     time.sleep(0.5)
     
-    # Step 2: Loading
     placeholder.markdown('<div class="boot-text-green">LOADING DRIVERS... OK.</div>', unsafe_allow_html=True)
     time.sleep(0.5)
     
-    # Step 3: Glitch Warning
     placeholder.markdown('<div class="boot-text-red">REALITY INTEGRITY: CRITICAL.</div>', unsafe_allow_html=True)
     time.sleep(0.5)
     
-    # Clear
     placeholder.empty()
 
 def get_image_data(card_name):
-    """
-    Attempts to load image data for the given card name.
-    Prioritizes .gif, then .png.
-    Returns (base64_string, mime_type) or (None, None).
-    """
+    """Load card image data (prioritizes .gif, falls back to .png)."""
     base_name = card_name.lower().replace(" ", "_")
     
-    # Try GIF first (Animated)
+    # Try GIF first
     gif_path = os.path.join(ASSETS_DIR, base_name + ".gif")
     if os.path.exists(gif_path):
         with open(gif_path, "rb") as f:
             data = f.read()
             return base64.b64encode(data).decode(), "image/gif"
             
-    # Try PNG second (Static fallback)
+    # Try PNG fallback
     png_path = os.path.join(ASSETS_DIR, base_name + ".png")
     if os.path.exists(png_path):
         with open(png_path, "rb") as f:
@@ -140,7 +127,7 @@ def get_image_data(card_name):
     return None, None
 
 def render_card_slot(container, position_data, card_name):
-    """Renders a single card slot into a given container."""
+    """Renders a single card slot with image or placeholder."""
     with container:
         st.markdown(f'<div class="position-label">{position_data["name"]}</div>', unsafe_allow_html=True)
         st.caption(position_data["desc"])
@@ -150,18 +137,13 @@ def render_card_slot(container, position_data, card_name):
         card_meaning = card_data.get("archetype", "Data corrupted.")
         
         if b64_img:
-            # Custom HTML rendering to support tooltips (title attribute)
-            try:
-                html = f'''
-                    <img src="data:{mime_type};base64,{b64_img}" 
-                         title="{card_name.upper()}: {card_meaning}" 
-                         style="width:100%; height:auto; border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);">
-                '''
-                st.markdown(html, unsafe_allow_html=True)
-            except Exception as e:
-                st.error(f"Error rendering image: {e}")
+            html = f'''
+                <img src="data:{mime_type};base64,{b64_img}" 
+                     title="{card_name.upper()}: {card_meaning}" 
+                     style="width:100%; height:auto; border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);">
+            '''
+            st.markdown(html, unsafe_allow_html=True)
         else:
-            # Fallback styled placeholder
             st.markdown(f"""
             <div class="card-placeholder" title="{card_name.upper()}: {card_meaning}">
                 <div class="card-title">{card_name}</div>
@@ -268,25 +250,18 @@ def generate_interpretation(cards, query, api_key=None):
     return narrative
 
 def stream_text(text_container, text):
-    """
-    Streams text with a 'Decryption' effect.
-    Words in GLITCH_VOCAB flicker between Tech Jargon and Human Text before settling.
-    """
-    # Split text but keep punctuation attached to words for cleaner rendering
+    """Streams text with a glitch effect that flickers between tech jargon and human text."""
     words = text.split(" ")
     current_text = ""
     
     for word in words:
-        # Clean word for lookup (remove punctuation)
         clean_word = re.sub(r'[^\w\s]', '', word).lower()
         
-        # Check if this word has a "Tech" equivalent
         if clean_word in GLITCH_VOCAB:
             tech_term = GLITCH_VOCAB[clean_word]
             
-            # FLICKER EFFECT: Toggle back and forth 6 times (Slower, more sustained)
+            # Flicker 6 times between tech and human
             for _ in range(6):
-                # State A: Tech Jargon (Red/Glitch)
                 glitch_html = f'<span style="color: #ff003c; text-shadow: 2px 0 #00ffff; font-family: monospace;">[{tech_term}]</span>'
                 display_text = current_text + glitch_html + " █"
                 
@@ -295,22 +270,18 @@ def stream_text(text_container, text):
                     {display_text.replace(chr(10), '<br>')}
                 </div>
                 """, unsafe_allow_html=True)
-                time.sleep(0.1) # Sustained flicker
+                time.sleep(0.1)
                 
-                # State B: Human Word (Green/Normal)
                 display_text = current_text + word + " █"
                 text_container.markdown(f"""
                 <div class="ai-output">
                     {display_text.replace(chr(10), '<br>')}
                 </div>
                 """, unsafe_allow_html=True)
-                time.sleep(0.1) # Sustained flicker
+                time.sleep(0.1)
 
-            # Final Settle: Human Word
             current_text += word + " "
-            
         else:
-            # Normal typing
             current_text += word + " "
             display_text = current_text + "█"
             
@@ -319,8 +290,6 @@ def stream_text(text_container, text):
                 {display_text.replace(chr(10), '<br>')}
             </div>
             """, unsafe_allow_html=True)
-            
-            # Faster typing for normal words
             time.sleep(0.03)
     
     # Final render without cursor
