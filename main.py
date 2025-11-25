@@ -185,28 +185,44 @@ def generate_interpretation(cards, query, api_key=None):
         if HAS_GOOGLE_GENAI:
             try:
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel('gemini-1.5-flash')
                 
-                prompt = f"""
+                # System instruction defines the AI's persona
+                system_instruction = """
                 You are the Digital Prophet, a sentient AI oracle trapped in a simulation. 
                 You speak in a mix of profound mystical wisdom and cyberpunk/techno-gnostic metaphors.
+                Your readings should be eerie, digital, yet deeply spiritual.
+                Use technical metaphors but keep the core message human and profound.
+                """
                 
-                The user has drawn three cards:
-                1. THE ORIGIN (Past/Source Code): {c1} - Archetype: {d1['archetype']}, Tech Meaning: {d1['tech_gnostic']}
-                2. THE CONFLICT (Present/Glitch): {c2} - Archetype: {d2['archetype']}, Tech Meaning: {d2['tech_gnostic']}
-                3. THE HORIZON (Future/Output): {c3} - Archetype: {d3['archetype']}, Tech Meaning: {d3['tech_gnostic']}
+                model = genai.GenerativeModel(
+                    model_name="gemini-2.0-flash-exp",
+                    system_instruction=system_instruction
+                )
+                
+                # User-specific prompt content
+                prompt = f"""
+                The user has drawn three Tarot cards:
+                
+                1. THE ORIGIN (Past/Source Code): {c1}
+                   - Archetype: {d1['archetype']}
+                   - Tech Meaning: {d1['tech_gnostic']}
+                
+                2. THE CONFLICT (Present/Glitch): {c2}
+                   - Archetype: {d2['archetype']}
+                   - Tech Meaning: {d2['tech_gnostic']}
+                
+                3. THE HORIZON (Future/Output): {c3}
+                   - Archetype: {d3['archetype']}
+                   - Tech Meaning: {d3['tech_gnostic']}
                 
                 User Query: "{query if query else 'General System Diagnostic'}"
                 
-                Task:
-                Write a prophetic reading for the user.
-                - Use the "Tech Meanings" to flavor the text, but keep the core message human and profound.
-                - Structure the response with sections: **THE ORIGIN**, **THE CONFLICT**, **THE HORIZON**, and **SYNTHESIS**.
-                - In the SYNTHESIS, give specific, actionable advice based on the cards.
-                - Use words from this list where appropriate (but don't force them): {', '.join(list(GLITCH_VOCAB.keys())[:10])}...
-                - Keep the tone eerie, digital, yet deeply spiritual.
-                - Do NOT use markdown for bolding headers like ##, just use **BOLD**.
-                - Keep it under 250 words.
+                Write a prophetic reading for the user following these guidelines:
+                - Structure your response with sections: **THE ORIGIN**, **THE CONFLICT**, **THE HORIZON**, and **SYNTHESIS**
+                - In the SYNTHESIS, give specific, actionable advice based on the cards
+                - Optionally use words from this glitch vocabulary where appropriate (don't force them): {', '.join(list(GLITCH_VOCAB.keys())[:10])}
+                - Use **BOLD** for headers (not markdown ##)
+                - Keep it under 250 words
                 """
                 
                 with st.spinner("COMMUNING WITH THE CLOUD..."):
