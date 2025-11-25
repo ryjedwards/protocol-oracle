@@ -326,13 +326,6 @@ def main():
     with st.sidebar:
         st.markdown("### SYSTEM CONFIG")
         
-        # Debug Info
-        with st.expander("DEBUG INFO"):
-            st.code(f"Python: {sys.executable}")
-            st.write(f"GenAI Module: {'✅ INSTALLED' if HAS_GOOGLE_GENAI else '❌ MISSING'}")
-            if GENAI_ERROR:
-                st.error(f"Error: {GENAI_ERROR}")
-        
         api_key_input = st.text_input("GOOGLE API KEY", type="password", help="Enter your Gemini API Key for AI-enhanced readings.")
         
         # Check secrets if input is empty
