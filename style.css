@@ -1,0 +1,309 @@
+/* PROTOCOL: ORACLE_v1 STYLESHEET */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+/* GLOBAL RESET & TERMINAL BASE */
+.stApp {
+    background-color: #000000;
+    /* Eerie Glitch Background */
+    background-image:
+        radial-gradient(circle at 50% 50%, rgba(0, 20, 0, 0.1), rgba(0, 0, 0, 0.9)),
+        repeating-linear-gradient(0deg, transparent, transparent 2px, #001100 2px, #001100 4px);
+    background-size: 100% 100%, 100% 4px;
+    color: #39ff14;
+    font-family: 'VT323', monospace;
+    overflow-x: hidden;
+}
+
+/* FLICKER ANIMATION */
+@keyframes flicker {
+    0% {
+        opacity: 0.97;
+    }
+
+    5% {
+        opacity: 0.95;
+    }
+
+    10% {
+        opacity: 0.9;
+    }
+
+    15% {
+        opacity: 0.95;
+    }
+
+    20% {
+        opacity: 0.99;
+    }
+
+    50% {
+        opacity: 0.95;
+    }
+
+    55% {
+        opacity: 0.9;
+    }
+
+    100% {
+        opacity: 0.97;
+    }
+}
+
+.stApp {
+    animation: flicker 6s infinite;
+}
+
+/* SCANLINE EFFECT OVERLAY */
+.scanlines {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0),
+            rgba(255, 255, 255, 0) 50%,
+            rgba(0, 0, 0, 0.3) 50%,
+            rgba(0, 0, 0, 0.3));
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+}
+
+/* NOISE OVERLAY */
+.stApp::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.15;
+    animation: noise-shift 0.2s infinite;
+}
+
+@keyframes noise-shift {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    10% {
+        transform: translate(-5%, -5%);
+    }
+
+    20% {
+        transform: translate(-10%, 5%);
+    }
+
+    30% {
+        transform: translate(5%, -10%);
+    }
+
+    40% {
+        transform: translate(-5%, 15%);
+    }
+
+    50% {
+        transform: translate(-10%, 5%);
+    }
+
+    60% {
+        transform: translate(15%, 0);
+    }
+
+    70% {
+        transform: translate(0, 10%);
+    }
+
+    80% {
+        transform: translate(-15%, 0);
+    }
+
+    90% {
+        transform: translate(10%, 5%);
+    }
+
+    100% {
+        transform: translate(5%, 0);
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+label {
+    color: #39ff14 !important;
+    font-family: 'VT323', monospace !important;
+    text-shadow: 0 0 4px rgba(57, 255, 20, 0.6);
+    position: relative;
+    z-index: 10;
+}
+
+/* Ensure main content sits above background effects */
+.block-container {
+    position: relative;
+    z-index: 10;
+}
+
+/* BOOT SEQUENCE STYLES */
+.boot-text-white {
+    color: #ffffff !important;
+    font-size: 2rem;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 5px #ffffff;
+}
+
+.boot-text-green {
+    color: #39ff14 !important;
+    font-size: 2rem;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 0 0 10px #39ff14;
+}
+
+.boot-text-red {
+    color: #ff003c !important;
+    font-size: 2.5rem;
+    font-family: 'Share Tech Mono', monospace;
+    text-shadow: 2px 2px 0px #00ffff, -2px -2px 0px #ff003c;
+    animation: glitch-text 0.2s infinite;
+}
+
+@keyframes glitch-text {
+    0% {
+        transform: translate(0)
+    }
+
+    20% {
+        transform: translate(-2px, 2px)
+    }
+
+    40% {
+        transform: translate(-2px, -2px)
+    }
+
+    60% {
+        transform: translate(2px, 2px)
+    }
+
+    80% {
+        transform: translate(2px, -2px)
+    }
+
+    100% {
+        transform: translate(0)
+    }
+}
+
+/* BUTTON STYLING */
+div.stButton>button {
+    background-color: #000000 !important;
+    color: #39ff14 !important;
+    border: 2px solid #39ff14 !important;
+    border-radius: 0px !important;
+    font-family: 'Share Tech Mono', monospace !important;
+    font-size: 24px !important;
+    padding: 10px 24px !important;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px #39ff14;
+    position: relative;
+    z-index: 2;
+}
+
+div.stButton>button:hover {
+    background-color: #39ff14 !important;
+    color: #000000 !important;
+    box-shadow: 0 0 20px #39ff14;
+    cursor: pointer;
+    text-shadow: none;
+}
+
+div.stButton>button:active {
+    transform: scale(0.98);
+}
+
+/* CARD PLACEHOLDER STYLING */
+.card-placeholder {
+    border: 2px dashed #39ff14;
+    background-color: rgba(0, 10, 0, 0.8);
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
+    position: relative;
+    z-index: 2;
+}
+
+.card-title {
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.position-label {
+    font-size: 1.2rem;
+    color: #ffb000 !important;
+    /* Amber for contrast */
+    text-shadow: 0 0 5px #ffb000;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ffb000;
+    display: inline-block;
+}
+
+/* AI OUTPUT BOX */
+.ai-output {
+    border: 1px solid #39ff14;
+    padding: 20px;
+    background-color: rgba(0, 20, 0, 0.85);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-top: 30px;
+    border-left: 5px solid #39ff14;
+    position: relative;
+    z-index: 2;
+}
+
+/* FOOTER */
+.footer-link {
+    text-align: center;
+    margin-top: 50px;
+    font-size: 1.2em;
+    opacity: 0.8;
+    border: 1px solid #333;
+    padding: 15px 30px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.3s ease;
+    color: #39ff14;
+    background-color: #050505;
+    position: relative;
+    z-index: 2;
+}
+
+.footer-link:hover {
+    border-color: #39ff14;
+    opacity: 1.0;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+}
+
+.footer-link a {
+    color: #ffb000 !important;
+    text-decoration: none;
+}
