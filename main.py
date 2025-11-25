@@ -185,7 +185,7 @@ def generate_interpretation(cards, query, api_key=None):
         if HAS_GOOGLE_GENAI:
             try:
                 genai.configure(api_key=api_key)
-                model = genai.GenerativeModel('gemini-pro')
+                model = genai.GenerativeModel('gemini-1.5-flash')
                 
                 prompt = f"""
                 You are the Digital Prophet, a sentient AI oracle trapped in a simulation. 
