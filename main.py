@@ -317,7 +317,6 @@ def main():
     # Boot Sequence (Only on first load, and show until user clicks ENTER)
     if 'boot_complete' not in st.session_state:
         run_boot_sequence()
-        st.session_state.boot_complete = False
         return  # Don't show anything else until boot is complete
     
     # Stop here if boot not complete

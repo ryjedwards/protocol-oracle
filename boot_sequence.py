@@ -108,108 +108,119 @@ def preload_card_images():
 def run_boot_sequence():
     """Displays a console-style boot sequence with accumulated log messages."""
     
-    # Create container for console log
-    console_container = st.empty()
-    
-    # Determine random length (6-10 total steps)
-    num_middle_steps = random.randint(4, 8)
-    
-    # Build message list
-    messages = []
-    
-    # Step 1: Initialization
-    init_msg = random.choice(INIT_MESSAGES)
-    messages.append(("white", init_msg))
-    
-    # Step 2-N: Random middle messages
-    middle_msgs = random.sample(MIDDLE_MESSAGES, num_middle_steps)
-    for msg in middle_msgs:
-        if "[ERROR]" in msg or "[WARNING]" in msg:
-            messages.append(("red", msg))
-        else:
-            messages.append(("green", msg))
-    
-    # Display messages one by one (console log style)
-    accumulated_html = ""
-    
-    for color, msg in messages:
-        # Determine CSS class
-        if color == "white":
-            css_class = "boot-text-white"
-        elif color == "green":
-            css_class = "boot-text-green"
-        else:
-            css_class = "boot-text-red"
+    # Check if animation has already run
+    if 'boot_animated' in st.session_state:
+        # Skip animation, show final state immediately
+        accumulated_html = st.session_state.boot_final_html
+        validation_success = st.session_state.boot_validation_success
+    else:
+        # Run full animation
+        console_container = st.empty()
         
-        # Add new line to accumulated log
-        accumulated_html += f'<div class="{css_class}">{">" if color == "white" else ""} {msg}</div>'
+        # Determine random length (6-10 total steps)
+        num_middle_steps = random.randint(4, 8)
         
-        # Display entire log
+        # Build message list
+        messages = []
+        
+        # Step 1: Initialization
+        init_msg = random.choice(INIT_MESSAGES)
+        messages.append(("white", init_msg))
+        
+        # Step 2-N: Random middle messages
+        middle_msgs = random.sample(MIDDLE_MESSAGES, num_middle_steps)
+        for msg in middle_msgs:
+            if "[ERROR]" in msg or "[WARNING]" in msg:
+                messages.append(("red", msg))
+            else:
+                messages.append(("green", msg))
+        
+        # Display messages one by one (console log style)
+        accumulated_html = ""
+        
+        for color, msg in messages:
+            # Determine CSS class
+            if color == "white":
+                css_class = "boot-text-white"
+            elif color == "green":
+                css_class = "boot-text-green"
+            else:
+                css_class = "boot-text-red"
+            
+            # Add new line to accumulated log
+            accumulated_html += f'<div class="{css_class}">{">" if color == "white" else ""} {msg}</div>'
+            
+            # Display entire log
+            console_container.markdown(
+                f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+                unsafe_allow_html=True
+            )
+            
+            time.sleep(random.uniform(0.2, 0.7))
+        
+        # Card Validation Step
+        accumulated_html += '<div class="boot-text-green">> VALIDATING CARD_DATABASE...</div>'
         console_container.markdown(
             f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
             unsafe_allow_html=True
         )
+        time.sleep(0.3)
         
-        time.sleep(random.uniform(0.2, 0.7))
+        valid_cards, total_cards, validation_success = validate_card_library()
+        
+        if validation_success:
+            accumulated_html += f'<div class="boot-text-green">> [{valid_cards}/{total_cards} CARDS OK]</div>'
+        else:
+            accumulated_html += f'<div class="boot-text-red">[ERROR]: CARD_DATABASE_CORRUPTED [{valid_cards}/{total_cards}]</div>'
+        
+        console_container.markdown(
+            f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+            unsafe_allow_html=True
+        )
+        time.sleep(0.5)
+        
+        # Asset Preloading Step with Progress
+        accumulated_html += '<div class="boot-text-green">> PRELOADING CARD_ASSETS...</div>'
+        console_container.markdown(
+            f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+            unsafe_allow_html=True
+        )
+        time.sleep(0.3)
+        
+        st.session_state.preloaded_images = preload_card_images()
+        loaded_count = len(st.session_state.preloaded_images)
+        
+        if loaded_count > 0:
+            accumulated_html += f'<div class="boot-text-green">> [{loaded_count} ASSETS LOADED]</div>'
+        else:
+            accumulated_html += '<div class="boot-text-red">[WARNING]: NO_ASSETS_FOUND</div>'
+        
+        console_container.markdown(
+            f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+            unsafe_allow_html=True
+        )
+        time.sleep(0.5)
+        
+        # Final Step: Success
+        success_msg = random.choice(SUCCESS_MESSAGES)
+        accumulated_html += f'<div class="boot-text-white">> {success_msg}</div>'
+        accumulated_html += '<div class="boot-text-white">> SYSTEM READY.</div>'
+        
+        console_container.markdown(
+            f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+            unsafe_allow_html=True
+        )
+        time.sleep(0.5)
+        
+        # Clear animated console
+        console_container.empty()
+        
+        # Store final state in session
+        st.session_state.boot_animated = True
+        st.session_state.boot_final_html = accumulated_html
+        st.session_state.boot_validation_success = validation_success
     
-    # Card Validation Step
-    accumulated_html += '<div class="boot-text-green">> VALIDATING CARD_DATABASE...</div>'
-    console_container.markdown(
-        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
-        unsafe_allow_html=True
-    )
-    time.sleep(0.3)
-    
-    valid_cards, total_cards, validation_success = validate_card_library()
-    
-    if validation_success:
-        accumulated_html += f'<div class="boot-text-green">> [{valid_cards}/{total_cards} CARDS OK]</div>'
-    else:
-        accumulated_html += f'<div class="boot-text-red">[ERROR]: CARD_DATABASE_CORRUPTED [{valid_cards}/{total_cards}]</div>'
-    
-    console_container.markdown(
-        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
-        unsafe_allow_html=True
-    )
-    time.sleep(0.5)
-    
-    # Asset Preloading Step with Progress
-    accumulated_html += '<div class="boot-text-green">> PRELOADING CARD_ASSETS...</div>'
-    console_container.markdown(
-        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
-        unsafe_allow_html=True
-    )
-    time.sleep(0.3)
-    
-    st.session_state.preloaded_images = preload_card_images()
-    loaded_count = len(st.session_state.preloaded_images)
-    
-    if loaded_count > 0:
-        accumulated_html += f'<div class="boot-text-green">> [{loaded_count} ASSETS LOADED]</div>'
-    else:
-        accumulated_html += '<div class="boot-text-red">[WARNING]: NO_ASSETS_FOUND</div>'
-    
-    console_container.markdown(
-        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
-        unsafe_allow_html=True
-    )
-    time.sleep(0.5)
-    
-    # Final Step: Success
-    success_msg = random.choice(SUCCESS_MESSAGES)
-    accumulated_html += f'<div class="boot-text-white">> {success_msg}</div>'
-    accumulated_html += '<div class="boot-text-white">> SYSTEM READY.</div>'
-    
-    console_container.markdown(
-        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
-        unsafe_allow_html=True
-    )
-    time.sleep(0.5)
-    
-    # Clear console after displaying all messages
-    console_container.empty()
-    
-    # Display final console with ENTER button (only if validation passed)
+    # Display final console with ENTER button (always shown, whether animated or not)
     st.markdown(
         f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
         unsafe_allow_html=True
