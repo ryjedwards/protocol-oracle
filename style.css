@@ -381,3 +381,87 @@ img:hover {
     animation: text-pulse 2s infinite;
     color: #ffffff !important;
 }
+
+/* ============================================ */
+/* RESPONSIVE DESIGN FOR MOBILE */
+/* ============================================ */
+
+/* Tablet and below */
+@media (max-width: 1024px) {
+    .card-title {
+        font-size: 1.5rem;
+    }
+
+    .position-label {
+        font-size: 1rem;
+    }
+}
+
+/* Mobile devices */
+@media (max-width: 768px) {
+
+    /* Force columns to stay horizontal and shrink */
+    div[data-testid="column"] {
+        flex: 1 1 33% !important;
+        min-width: 0 !important;
+        padding: 0 4px !important;
+    }
+
+    /* Shrink card placeholders */
+    .card-placeholder {
+        height: auto !important;
+        min-height: 120px;
+        padding: 8px;
+    }
+
+    /* Smaller card text */
+    .card-title {
+        font-size: 0.7rem !important;
+        letter-spacing: 1px;
+    }
+
+    /* Smaller position labels */
+    .position-label {
+        font-size: 0.7rem !important;
+        margin-bottom: 5px;
+    }
+
+    /* Adjust AI output for mobile */
+    .ai-output {
+        font-size: 0.9rem;
+        padding: 12px;
+        line-height: 1.4;
+    }
+
+    /* Smaller button on mobile */
+    div.stButton>button {
+        font-size: 16px !important;
+        padding: 8px 16px !important;
+    }
+
+    /* Smaller boot text on mobile */
+    .boot-text-white,
+    .boot-text-green {
+        font-size: 0.9rem !important;
+    }
+
+    .boot-text-red {
+        font-size: 1.1rem !important;
+    }
+}
+
+/* Very small phones */
+@media (max-width: 480px) {
+    .card-title {
+        font-size: 0.6rem !important;
+        letter-spacing: 0.5px;
+    }
+
+    .position-label {
+        font-size: 0.6rem !important;
+    }
+
+    .card-placeholder {
+        min-height: 100px;
+    }
+}
