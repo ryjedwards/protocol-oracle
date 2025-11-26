@@ -171,9 +171,11 @@ def stream_text_glitch(text_container, text):
     for chunk in chunks:
         current_text += chunk
         if len(current_text) % 5 == 0 or "\n" in chunk:
-            text_container.markdown(f'<div class="ai-output">{current_text}█</div>', unsafe_allow_html=True)
+            # FIX: Added \n\n to ensure markdown headers are parsed correctly inside the div
+            text_container.markdown(f'<div class="ai-output">\n\n{current_text}█</div>', unsafe_allow_html=True)
             time.sleep(0.01)
-    text_container.markdown(f'<div class="ai-output">{current_text}</div>', unsafe_allow_html=True)
+    # FIX: Added \n\n to ensure markdown headers are parsed correctly inside the div
+    text_container.markdown(f'<div class="ai-output">\n\n{current_text}</div>', unsafe_allow_html=True)
 
 # --- MAIN APP LOGIC ---
 def main():
@@ -201,7 +203,7 @@ def main():
 
 
     # Header
-    st.markdown("<h1 style='text-align: center; letter-spacing: 5px;'>PROTOCOL: ORACLE_v1</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center; letter-spacing: 5px;'>PROTOCOL: ORACLE_v1.0.7</h1>", unsafe_allow_html=True)
 
     if st.session_state.stage == "INPUT":
         c_in, c_mid, c_out = st.columns([1,2,1])
@@ -265,7 +267,8 @@ def main():
                 stream_text_glitch(out_container, st.session_state.reading)
                 st.session_state.streamed = True
             else:
-                out_container.markdown(f'<div class="ai-output">{st.session_state.reading}</div>', unsafe_allow_html=True)
+                # FIX: Added \n\n to ensure markdown headers are parsed correctly inside the div
+                out_container.markdown(f'<div class="ai-output">\n\n{st.session_state.reading}</div>', unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
         ac1, ac2 = st.columns(2)

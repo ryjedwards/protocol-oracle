@@ -66,8 +66,10 @@ def render_hex_dump(container, lines=8):
 
 def render_final_state(container):
     """Draws the static 'System Ready' screen, applying neon and flicker effects."""
+    # FIX: Use 'with container.container()' to ensure all elements are scoped to the passed container.
+    # AND pass the container context (st) to render_ascii_art so it draws INSIDE this container.
     with container.container():
-        render_ascii_art(st) # Now includes the .boot-logo-container
+        render_ascii_art(st) # 'st' here refers to the container context because of the 'with' block
         
         # Apply flicker to horizontal rules
         st.markdown("<div class='flicker-text'>---</div>", unsafe_allow_html=True)
