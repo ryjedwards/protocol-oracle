@@ -3,134 +3,134 @@
 CARD_LIBRARY = {
     "The Fool": {
         "archetype": "The New Initiate",
-        "tech_gnostic": "The Zero-Day Exploit. A packet of potential energy with no destination address. Pure input without processing.",
+        "gnostic": "The Divine Spark falling into matter. The beginning of the Sophia mythos. Pure potential entering the Kenoma.",
         "keywords": ["Beginnings", "Innocence", "Leap of Faith", "Originality", "Spontaneity"],
-        "advice": "Execute the command without knowing the output. Trust the source code."
+        "advice": "Step into the void. The fall is necessary for the ascent."
     },
     "The Magician": {
         "archetype": "The Operator",
-        "tech_gnostic": "The Admin. One who has root access to the simulation and can recompile reality at will.",
+        "gnostic": "The Demiurge. The shaper of the material illusion who mistakes himself for the Creator.",
         "keywords": ["Manifestation", "Resourcefulness", "Power", "Inspired Action"],
-        "advice": "You have all the dependencies installed. Run the build."
+        "advice": "You have the power to shape this reality, but do not mistake it for the Truth."
     },
     "The High Priestess": {
         "archetype": "The Encrypted Log",
-        "tech_gnostic": "The Hidden Directory. Data that exists but is not rendered. The subconscious buffer.",
+        "gnostic": "Sophia (Wisdom). The hidden light trapped in the darkness. The silence that holds the memory of the Pleroma.",
         "keywords": ["Intuition", "Sacred Knowledge", "Divine Feminine", "The Subconscious"],
-        "advice": "Stop trying to parse the data logically. Read the hex dump of your soul."
+        "advice": "Look beyond the veil. The silence holds the memory of your true home."
     },
     "The Empress": {
         "archetype": "The Motherboard",
-        "tech_gnostic": "The Generative Grid. The hardware that allows software to exist. Infinite bandwidth of creation.",
+        "gnostic": "Barbelo. The first emanation. The womb of all spirit and the infinite bandwidth of creation.",
         "keywords": ["Femininity", "Beauty", "Nature", "Nurturing", "Abundance"],
-        "advice": "Create a new instance. Allow the system to grow organically."
+        "advice": "Nurture the spirit within. Creation is an act of remembrance."
     },
     "The Emperor": {
         "archetype": "The Firewall",
-        "tech_gnostic": "The Master Control Program. Rigid structure, permissions, and protocols. Stability through restriction.",
+        "gnostic": "The Archon. The ruler of material laws and limitations. Structure that can become a prison.",
         "keywords": ["Authority", "Establishment", "Structure", "Father Figure"],
-        "advice": "Impose order on the chaos. Define your variables strictly."
+        "advice": "Order is useful, but do not let the structure become your cage."
     },
     "The Hierophant": {
         "archetype": "The Legacy Code",
-        "tech_gnostic": "The Established Protocol. The documentation that everyone follows. Tradition as a security measure.",
+        "gnostic": "The Orthodox. The outer church that guards the gate but does not enter. Tradition as a barrier to Gnosis.",
         "keywords": ["Spiritual Wisdom", "Religious Beliefs", "Conformity", "Tradition"],
-        "advice": "Follow the standard operating procedure for now. Learn the rules before breaking them."
+        "advice": "Learn the tradition, then transcend it. The true temple is within."
     },
     "The Lovers": {
         "archetype": "The Binary Pair",
-        "tech_gnostic": "The Handshake. Two systems synchronizing. The moment of connection or bifurcation.",
+        "gnostic": "The Syzygy. The divine pairing of aeons. The reconciliation of opposites in the bridal chamber.",
         "keywords": ["Love", "Harmony", "Relationships", "Values Alignment", "Choices"],
-        "advice": "Integrate the conflicting files. Choose your connection carefully."
+        "advice": "Seek unity in division. The other is a mirror of your own light."
     },
     "The Chariot": {
         "archetype": "The Drive",
-        "tech_gnostic": "The Overclock. Pushing the hardware to its limit to achieve a specific vector. Controlled velocity.",
+        "gnostic": "The Ascent. The soul's vehicle rising through the spheres. Triumph over the lower elements.",
         "keywords": ["Control", "Willpower", "Success", "Action", "Determination"],
-        "advice": "Focus your processing power on a single thread. Do not multitask."
+        "advice": "Harness the opposing forces. Your will must be singular to pierce the firmament."
     },
     "Strength": {
         "archetype": "The Stable Core",
-        "tech_gnostic": "The Heat Sink. Enduring high-load processes without crashing. Quiet power over brute force.",
+        "gnostic": "Pneumatic Power. The spirit overcoming the animal soul (Hylic). Endurance through inner fire.",
         "keywords": ["Strength", "Courage", "Persuasion", "Influence", "Compassion"],
-        "advice": "Regulate your temperature. Endurance wins over spikes in voltage."
+        "advice": "True power is quiet. Tame the beast with understanding, not force."
     },
     "The Hermit": {
         "archetype": "The Offline Mode",
-        "tech_gnostic": "Air-Gapped Wisdom. Disconnecting from the network to process internal data without noise.",
+        "gnostic": "The Gnostic Seeker. The one who carries the spark of light in the darkness of the world.",
         "keywords": ["Soul-searching", "Introspection", "Being Alone", "Inner Guidance"],
-        "advice": "Disconnect from the internet. The answer is on your local drive."
+        "advice": "Withdraw from the noise. The truth is hidden in your own silence."
     },
     "Wheel of Fortune": {
         "archetype": "The RNG",
-        "tech_gnostic": "The Algorithm. The random number generator that dictates the spawn points and loot drops of life.",
+        "gnostic": "Heimarmene (Fate). The crushing wheel of the zodiac and planetary influences that bind the soul.",
         "keywords": ["Good Luck", "Karma", "Life Cycles", "Destiny", "A Turning Point"],
-        "advice": "The variables have shifted. Adapt to the new patch."
+        "advice": "The stars dictate the flesh, not the spirit. Rise above the cycle."
     },
     "Justice": {
         "archetype": "The Audit",
-        "tech_gnostic": "The Checksum. Verifying that the input matches the output. The inevitable balancing of the equation.",
+        "gnostic": "Ma'at. The law of cause and effect in the Kenoma. The inevitable balancing of the equation.",
         "keywords": ["Justice", "Fairness", "Truth", "Cause and Effect", "Law"],
-        "advice": "Review your logs. Balance the equation."
+        "advice": "Weigh your actions. What you put into the illusion returns to you."
     },
     "The Hanged Man": {
         "archetype": "The Glitch",
-        "tech_gnostic": "The Frozen Screen. A system hang that forces you to look at the reflection in the monitor.",
+        "gnostic": "The Sacrifice. Suspending the ego to perceive the divine inversion. Seeing the world as upside down.",
         "keywords": ["Pause", "Surrender", "Letting Go", "New Perspectives"],
-        "advice": "Stop the execution. View the problem from a different angle."
+        "advice": "Let go of the world's logic. To gain the light, you must lose the self."
     },
     "Death": {
         "archetype": "The Terminator",
-        "tech_gnostic": "The Kill Signal. Ending a process so memory can be freed. Essential garbage collection.",
+        "gnostic": "Liberation. The shedding of the material shell. The release of the spark from the prison of form.",
         "keywords": ["Endings", "Change", "Transformation", "Transition"],
-        "advice": "Terminate the process. It is consuming too much RAM."
+        "advice": "Do not fear the end. It is the breaking of the chain."
     },
     "Temperance": {
         "archetype": "The Mixer",
-        "tech_gnostic": "The Load Balancer. Optimizing resources between two servers to ensure stability.",
+        "gnostic": "Alchemy. The blending of fire and water. The middle path back to the center.",
         "keywords": ["Balance", "Moderation", "Patience", "Purpose"],
-        "advice": "Blend the data streams. Find the middle path."
+        "advice": "Mix the volatile with the fixed. Patience is the key to transmutation."
     },
     "The Devil": {
         "archetype": "The Malware",
-        "tech_gnostic": "The Infinite Loop. A script you cannot stop running. Addiction to the user interface.",
+        "gnostic": "The Archons' Grip. Attachment to matter. The illusion of separation and the addiction to form.",
         "keywords": ["Shadow Self", "Attachment", "Addiction", "Restriction", "Sexuality"],
-        "advice": "Break the loop. You have the admin password; use it."
+        "advice": "Recognize the chains are of your own making. Wake up from the dream of matter."
     },
     "The Tower": {
         "archetype": "The Crash",
-        "tech_gnostic": "The Blue Screen of Death. Catastrophic failure of the operating system. Unsaved data is lost.",
+        "gnostic": "The Destruction of the Temple. The shattering of false reality and ego structures.",
         "keywords": ["Sudden Change", "Upheaval", "Chaos", "Revelation", "Awakening"],
-        "advice": "Let it crash. The system was corrupt anyway."
+        "advice": "Let the false self collapse. Only what is real will remain."
     },
     "The Star": {
         "archetype": "The Beacon",
-        "tech_gnostic": "The Recovery Disk. A small file that allows for a system restore. Hope in the dark web.",
+        "gnostic": "The Pleroma. The distant light of the fullness. Hope from beyond the spheres.",
         "keywords": ["Hope", "Faith", "Purpose", "Renewal", "Spirituality"],
-        "advice": "Follow the signal. Trust that the backup exists."
+        "advice": "Follow the distant light. It is the memory of your true home."
     },
     "The Moon": {
         "archetype": "The Deepfake",
-        "tech_gnostic": "The Simulation Artifact. Render errors that look like monsters. Fear of the corrupted file.",
+        "gnostic": "The Archontic Deception. The false light. Confusion in the astral realm.",
         "keywords": ["Illusion", "Fear", "Anxiety", "Subconscious", "Intuition"],
-        "advice": "Run a virus scan. What you see is not the code."
+        "advice": "Trust your intuition, not your eyes. The shadows are tricks of the mind."
     },
     "The Sun": {
         "archetype": "The Render",
-        "tech_gnostic": "High Definition. 8K resolution of truth. No shadows, no hidden pixels.",
+        "gnostic": "The Logos. The Christos. The illuminating truth that burns away shadow.",
         "keywords": ["Positivity", "Fun", "Warmth", "Success", "Vitality"],
-        "advice": "Display the truth. Optimize for brightness."
+        "advice": "Shine without hesitation. The light reveals all things as they are."
     },
     "Judgement": {
         "archetype": "The Wake-Up Call",
-        "tech_gnostic": "The System Alert. A notification that requires immediate user action. Level up.",
+        "gnostic": "The Call. The awakening of the spark from its slumber. The resurrection of the spirit.",
         "keywords": ["Judgement", "Rebirth", "Inner Calling", "Absolution"],
-        "advice": "Respond to the prompt. Upgrade your OS."
+        "advice": "The trumpet sounds for you. Rise from the grave of ignorance."
     },
     "The World": {
         "archetype": "The Full Stack",
-        "tech_gnostic": "Gold Master. The project is complete and ready for deployment. Integration of all modules.",
+        "gnostic": "The Restoration. The return of the spark to the Pleroma. Wholeness and completion.",
         "keywords": ["Completion", "Integration", "Accomplishment", "Travel"],
-        "advice": "Ship it. The cycle is complete."
+        "advice": "The journey is a circle. You have returned to the beginning, but with knowledge."
     }
 }

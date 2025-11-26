@@ -3,146 +3,162 @@ import requests
 import time
 import random
 from io import BytesIO
-from urllib.parse import quote  # <--- The fix for URL errors
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageOps, ImageChops
 from glitch_this import ImageGlitcher
 
-# CONFIGURATION
+# --- CONFIGURATION ---
 OUTPUT_DIR = "./assets/cards/"
-GLITCH_LEVEL = 3.5
-FRAMES = 15
-DURATION = 100
+FRAMES = 15             # Frames for the GIF
+DURATION = 80           # Faster speed for smooth scanning
+GLITCH_LEVEL = 2.0      # Static noise level
 
-# CARD MAPPING
-CARD_DATA = {
-    "THE FOOL": "cyberpunk silhouette stepping off a digital cliff into the void, neon green wireframe, glitch art",
-    "THE MAGICIAN": "hacker wizard controlling floating data streams, holographic sigils, dark room, neon green",
-    "THE HIGH PRIESTESS": "digital goddess behind a veil of binary code, mystical, dark, glowing eyes",
-    "THE EMPRESS": "mother board circuit tree of life, nature merging with machine, lush digital green",
-    "THE EMPEROR": "rigid geometric obsidian throne, authoritarian cyber structure, red and black",
-    "THE HIEROPHANT": "robotic priest downloading dogma, connecting cables to followers, ancient cybernetic temple",
-    "THE LOVERS": "two digital souls merging code, dna helix made of light, connection, harmony",
-    "THE CHARIOT": "futuristic sleek tank vehicle speeding through a data tunnel, aggressive, motion blur",
-    "STRENGTH": "woman taming a robotic cyber lion, glowing circuits, calm control",
-    "THE HERMIT": "lone hooded figure holding a glowing lantern in a dark server room, isolation",
-    "WHEEL OF FORTUNE": "giant mechanical gear wheel spinning destiny, tarot iconography, matrix code",
-    "JUSTICE": "blindfolded android holding scales made of laser light, perfect balance, symmetry",
-    "THE HANGED MAN": "figure suspended upside down in a web of wires, enlightenment, perspective shift",
-    "DEATH": "grim reaper made of black smoke and skulls, end of simulation, reboot",
-    "TEMPERANCE": "alchemist mixing two glowing fluids, balance, flow, water and fire",
-    "THE DEVIL": "terrifying horned demon made of cables and chains, entrapment, addiction",
-    "THE TOWER": "massive skyscraper struck by green lightning, crumbling, digital debris falling",
-    "THE STAR": "naked figure pouring starlight into a pool, hope, distant glowing constellation",
-    "THE MOON": "giant pale moon with glitch artifacts, wolf howling, illusion, subconscious",
-    "THE SUN": "blindingly bright digital sun, joy, clarity, explosive energy, lens flare",
-    "JUDGEMENT": "angels blowing trumpets awakening the dead from graves, ascension, final call",
-    "THE WORLD": "perfect circle Ouroboros snake eating tail, completion, the universe inside a microchip"
+# --- RELIABLE SOURCE (Sacred Texts Archive) ---
+# This is the gold standard for RWS images. They use 'ar00.jpg' format.
+BASE_URL = "https://www.sacred-texts.com/tarot/pkt/img/"
+
+# --- MAPPING (Updated for Sacred Texts) ---
+# ar00 = Fool, ar01 = Magician, etc.
+RWS_MAP = {
+    "THE FOOL": "ar00.jpg", "THE MAGICIAN": "ar01.jpg", "THE HIGH PRIESTESS": "ar02.jpg",
+    "THE EMPRESS": "ar03.jpg", "THE EMPEROR": "ar04.jpg", "THE HIEROPHANT": "ar05.jpg",
+    "THE LOVERS": "ar06.jpg", "THE CHARIOT": "ar07.jpg", "STRENGTH": "ar08.jpg",
+    "THE HERMIT": "ar09.jpg", "WHEEL OF FORTUNE": "ar10.jpg", "JUSTICE": "ar11.jpg",
+    "THE HANGED MAN": "ar12.jpg", "DEATH": "ar13.jpg", "TEMPERANCE": "ar14.jpg",
+    "THE DEVIL": "ar15.jpg", "THE TOWER": "ar16.jpg", "THE STAR": "ar17.jpg",
+    "THE MOON": "ar18.jpg", "THE SUN": "ar19.jpg", "JUDGEMENT": "ar20.jpg",
+    "THE WORLD": "ar21.jpg"
 }
 
 def ensure_dir(directory):
     if not os.path.exists(directory):
         os.makedirs(directory)
 
-def fetch_fallback_image(card_name):
-    """Fallback: Gets a moody random photo if AI fails"""
-    print(f"   [!] ACTIVATING FALLBACK PROTOCOL FOR {card_name}...")
-    # Seeded random so it's consistent for that card name
-    seed = sum(bytearray(card_name.encode('utf-8')))
-    url = f"https://picsum.photos/seed/{seed}/600/900?grayscale"
+def fetch_vintage_plate(filename):
+    """Fetches the 1909 RWS card image from Sacred Texts."""
+    url = BASE_URL + filename
+    print(f"   >>> Downloading Archive: {filename}...")
     try:
-        response = requests.get(url, timeout=10)
+        # User-Agent helps avoid being blocked by some servers
+        headers = {'User-Agent': 'Mozilla/5.0'} 
+        response = requests.get(url, headers=headers, timeout=15)
+        response.raise_for_status()
         return Image.open(BytesIO(response.content))
-    except:
-        return Image.new('RGB', (600, 900), color='black')
+    except Exception as e:
+        print(f"   !!! DOWNLOAD ERROR: {e}")
+        # Return a black fallback card so script doesn't crash
+        return Image.new('RGB', (300, 500), color='black')
 
-def fetch_ai_image(prompt, card_name):
-    """Tries to get AI image, handles 500 errors with retries"""
-    # ENCODING FIX: Safely encode the URL string
-    base_style = "dark noir cyberpunk style, stark black background, green neon accents, detailed, 8k"
-    full_prompt = f"{prompt}, {base_style}"
-    safe_prompt = quote(full_prompt) 
+def generate_wireframe_overlay(w, h):
+    """Creates the 'PIL Generated' techno-geometry layer."""
+    img = Image.new('RGB', (w, h), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
     
-    url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=600&height=900&nologo=true"
+    # Draw random green grid lines
+    for _ in range(10):
+        x = random.randint(0, w)
+        draw.line((x, 0, x, h), fill="#003300", width=1)
     
-    # RETRY LOOP
-    for attempt in range(1, 4):
-        try:
-            print(f"   >>> Requesting Neural Pattern (Attempt {attempt}/3)...")
-            response = requests.get(url, timeout=30)
-            
-            if response.status_code == 200:
-                return Image.open(BytesIO(response.content))
-            elif response.status_code >= 500:
-                print(f"   [!] Server Error {response.status_code}. Retrying in 2s...")
-                time.sleep(2)
-            else:
-                print(f"   [!] Client Error {response.status_code}.")
-                break # Don't retry 404s
-                
-        except Exception as e:
-            print(f"   [!] Connection Error: {e}")
-            time.sleep(1)
+    # Draw random "Targeting" boxes
+    for _ in range(5):
+        x1 = random.randint(0, w-50)
+        y1 = random.randint(0, h-50)
+        draw.rectangle((x1, y1, x1+50, y1+50), outline="#39ff14", width=1)
+    
+    return img
 
-    # If we get here, all retries failed. Use Fallback.
-    return fetch_fallback_image(card_name)
-
-def add_techno_text(image, text):
+def apply_scanner_effect(image, frame_index, total_frames):
+    """Draws a horizontal bright green scanline."""
+    w, h = image.size
     draw = ImageDraw.Draw(image)
-    W, H = image.size
+    
+    scan_y = int((h / total_frames) * frame_index)
+    
+    # Laser line
+    draw.line((0, scan_y, w, scan_y), fill="#39ff14", width=3)
+    # Trail
+    if scan_y > 5:
+        draw.line((0, scan_y-5, w, scan_y-5), fill="#005500", width=2)
+    
+    return image
+
+def process_card_frame(base_img, wireframe_img, frame_idx, card_name):
+    """Combines Vintage Card + Wireframe + Scanner + Text"""
+    # 1. Resize/Grayscale
+    img = ImageOps.grayscale(base_img).convert("RGB")
+    img = img.resize((600, 900))
+    
+    # 2. Blend with Wireframe
+    img = ImageChops.add(img, wireframe_img)
+    
+    # 3. Add Scanner Bar
+    img = apply_scanner_effect(img, frame_idx, FRAMES)
+    
+    # 4. Add Text Label
+    draw = ImageDraw.Draw(img)
     try:
-        font = ImageFont.truetype("arial.ttf", 50)
+        font = ImageFont.truetype("arial.ttf", 55)
     except:
         font = ImageFont.load_default()
-
-    # Draw Text
-    w_text = draw.textlength(text, font=font)
-    position = ((W - w_text) / 2, H - 100)
+        
+    w_text = draw.textlength(card_name, font=font)
+    position = ((600 - w_text) / 2, 780)
     
-    left, top, right, bottom = draw.textbbox(position, text, font=font)
-    draw.rectangle((left-10, top-10, right+10, bottom+10), fill="black", outline="#39ff14")
-    draw.text(position, text, fill="#39ff14", font=font)
-    return image
+    left, top, right, bottom = draw.textbbox(position, card_name, font=font)
+    draw.rectangle((left-15, top-15, right+15, bottom+15), fill="black", outline="#39ff14")
+    draw.text(position, card_name, fill="#39ff14", font=font)
+    
+    return img
 
 def main():
     ensure_dir(OUTPUT_DIR)
     glitcher = ImageGlitcher()
     
-    print(f"BOOTING ANIMATION PROTOCOL... {len(CARD_DATA)} ASSETS QUEUED.")
+    print(f"BOOTING SCANNER PROTOCOL... TARGET: {len(RWS_MAP)} ASSETS.")
     
-    for name, prompt in CARD_DATA.items():
-        filename = name.lower().replace(" ", "_") + ".gif"
-        save_path = os.path.join(OUTPUT_DIR, filename)
+    for name, filename in RWS_MAP.items():
+        save_filename = name.lower().replace(" ", "_") + ".gif"
+        save_path = os.path.join(OUTPUT_DIR, save_filename)
         
         if os.path.exists(save_path):
-             print(f"[SKIP] {filename} exists.")
+             print(f"[SKIP] {save_filename} exists.")
              continue
-
+             
         print(f"PROCESSING: {name}")
         
-        # 1. Get Image (With Fallback Protection)
-        img = fetch_ai_image(prompt, name)
+        # 1. Fetch Source
+        base_img = fetch_vintage_plate(filename)
         
-        # 2. Add Label
-        img = add_techno_text(img, name)
+        # 2. Generate Wireframe
+        wireframe = generate_wireframe_overlay(600, 900)
         
-        # 3. Glitch & Animate
-        glitched_frames = glitcher.glitch_image(img, GLITCH_LEVEL, color_offset=True, gif=True, frames=FRAMES)
+        # 3. Build & Glitch Frames Individually (Fixes AttributeError)
+        final_frames = []
         
-        # 4. Save
-        glitched_frames[0].save(
+        for i in range(FRAMES):
+            # Create the raw frame (Scanner + Text + Vintage)
+            raw_frame = process_card_frame(base_img, wireframe, i, name)
+            
+            # Glitch THIS specific frame
+            # Note: glitch_image returns an Image object when gif=False
+            glitched_frame = glitcher.glitch_image(raw_frame, GLITCH_LEVEL, color_offset=True, gif=False)
+            
+            final_frames.append(glitched_frame)
+        
+        # 4. Save the sequence as a GIF
+        final_frames[0].save(
             save_path,
             format='GIF',
-            append_images=glitched_frames[1:],
+            append_images=final_frames[1:],
             save_all=True,
             duration=DURATION,
             loop=0
         )
-        print(f"   -> ANIMATION COMPILED: {filename}")
+        print(f"   -> COMPILED: {save_filename}")
         
-        # Pause to prevent rate limiting
-        time.sleep(1.5)
+        # Be polite to the server
+        time.sleep(0.5)
 
-    print("ALL GIFS GENERATED.")
+    print("ALL ASSETS SECURED.")
 
 if __name__ == "__main__":
     main()

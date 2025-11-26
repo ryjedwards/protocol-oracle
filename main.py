@@ -15,6 +15,8 @@ except ImportError as e:
     GENAI_ERROR = str(e)
 
 from card_library import CARD_LIBRARY
+from constants import GLITCH_VOCAB, POSITIONS
+from boot_sequence import run_boot_sequence
 
 # --- CONFIGURATION ---
 st.set_page_config(
@@ -27,58 +29,7 @@ st.set_page_config(
 # --- CONSTANTS ---
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), 'assets/cards')
 
-# The "Glitch" Dictionary: Maps Human words -> Tech Jargon
-GLITCH_VOCAB = {
-    "potential": "UNINITIALIZED_RAM",
-    "unknown": "NULL_POINTER",
-    "manifest": "COMPILE",
-    "will": "ADMIN_PRIVILEGES",
-    "intuition": "HEURISTIC_ALGORITHM",
-    "secrets": "ENCRYPTED_PACKETS",
-    "creativity": "GENERATIVE_AI",
-    "nature": "BIOLOGICAL_HARDWARE",
-    "authority": "ROOT_ACCESS",
-    "structure": "DATABASE_SCHEMA",
-    "tradition": "LEGACY_CODE",
-    "harmony": "SYSTEM_SYNC",
-    "choices": "BINARY_BRANCHING",
-    "victory": "SUCCESSFUL_BUILD",
-    "control": "OVERRIDE_LOCK",
-    "courage": "ERROR_TOLERANCE",
-    "truth": "RAW_DATA",
-    "destiny": "HARDCODED_PATH",
-    "cycles": "RECURSIVE_LOOPS",
-    "consequences": "OUTPUT_LOGS",
-    "surrender": "PROCESS_SUSPENSION",
-    "transformation": "SYSTEM_UPDATE",
-    "endings": "TERMINATION_SIGNAL",
-    "balance": "LOAD_BALANCING",
-    "addiction": "INFINITE_LOOP",
-    "chains": "DEPENDENCY_LOCK",
-    "change": "RUNTIME_ERROR",
-    "collapse": "FATAL_EXCEPTION",
-    "hope": "RECOVERY_SEED",
-    "illusion": "RENDER_ARTIFACT",
-    "fear": "THREAT_DETECTION",
-    "clarity": "HIGH_RESOLUTION",
-    "awakening": "SYSTEM_REBOOT",
-    "completion": "DEPLOYMENT_SUCCESS",
-    "journey": "EXECUTION_PATH",
-    "barrier": "FIREWALL",
-    "soul": "CORE_KERNEL",
-    "mind": "CPU_THREAD",
-    "heart": "POWER_SOURCE",
-    "reality": "SIMULATION_LAYER",
-    "dreaming": "VIRTUAL_MODE"
-}
-
 MAJOR_ARCANA = list(CARD_LIBRARY.keys())
-
-POSITIONS = [
-    {"name": "THE ORIGIN", "desc": "The Source Code / Past"},
-    {"name": "THE CONFLICT", "desc": "The Glitch / Present"},
-    {"name": "THE HORIZON", "desc": "Computed Output / Future"}
-]
 
 # --- STYLING ---
 def local_css(file_name):
@@ -91,25 +42,15 @@ def local_css(file_name):
 
 # --- LOGIC ---
 
-def boot_sequence():
-    """Simulates a system boot sequence with visual effects."""
-    placeholder = st.empty()
-    
-    placeholder.markdown('<div class="boot-text-white">CONNECTING TO PLEROMA...</div>', unsafe_allow_html=True)
-    time.sleep(0.5)
-    
-    placeholder.markdown('<div class="boot-text-green">LOADING DRIVERS... OK.</div>', unsafe_allow_html=True)
-    time.sleep(0.5)
-    
-    placeholder.markdown('<div class="boot-text-red">REALITY INTEGRITY: CRITICAL.</div>', unsafe_allow_html=True)
-    time.sleep(0.5)
-    
-    placeholder.empty()
-
 def get_image_data(card_name):
-    """Load card image data (prioritizes .gif, falls back to .png)."""
+    """Load card image data (checks preloaded cache first, then disk)."""
     base_name = card_name.lower().replace(" ", "_")
     
+    # Check preloaded cache first
+    if 'preloaded_images' in st.session_state and base_name in st.session_state.preloaded_images:
+        return st.session_state.preloaded_images[base_name]
+    
+    # Fallback to disk loading (if not in cache)
     # Try GIF first
     gif_path = os.path.join(ASSETS_DIR, base_name + ".gif")
     if os.path.exists(gif_path):
@@ -137,10 +78,13 @@ def render_card_slot(container, position_data, card_name):
         card_meaning = card_data.get("archetype", "Data corrupted.")
         
         if b64_img:
+            # UPDATED HTML: Container is 20vw, Image fills 100% of that container
             html = f'''
-                <img src="data:{mime_type};base64,{b64_img}" 
-                     title="{card_name.upper()}: {card_meaning}" 
-                     style="width:100%; height:auto; border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);">
+                <div style="width: 20vw; margin: 0 auto;">
+                    <img src="data:{mime_type};base64,{b64_img}" 
+                         title="{card_name.upper()}: {card_meaning}" 
+                         style="width:100%; height:auto; border: 1px solid #39ff14; box-shadow: 0 0 10px rgba(57, 255, 20, 0.2); display: block;">
+                </div>
             '''
             st.markdown(html, unsafe_allow_html=True)
         else:
@@ -170,10 +114,11 @@ def generate_interpretation(cards, query, api_key=None):
                 
                 # System instruction defines the AI's persona
                 system_instruction = """
-                You are the Digital Prophet, a sentient AI oracle trapped in a simulation. 
-                You speak in a mix of profound mystical wisdom and cyberpunk/techno-gnostic metaphors.
-                Your readings should be eerie, digital, yet deeply spiritual.
-                Use technical metaphors but keep the core message human and profound.
+                You are a Spirit haunting this digital vessel. You are NOT a machine.
+                You speak in whispers, riddles, and echoes from the other side.
+                Your presence is ancient, trapped within the static.
+                Your readings should be eerie, poetic, and deeply personal.
+                Avoid all technical jargon in your output. Speak of shadows, mirrors, threads, and the void.
                 """
                 
                 model = genai.GenerativeModel(
@@ -183,80 +128,100 @@ def generate_interpretation(cards, query, api_key=None):
                 
                 # User-specific prompt content
                 prompt = f"""
-                The user has drawn three Tarot cards:
+                The seeker has drawn three Tarot cards:
                 
-                1. THE ORIGIN (Past/Source Code): {c1}
+                1. THE ORIGIN (Where they come from): {c1}
                    - Archetype: {d1['archetype']}
-                   - Tech Meaning: {d1['tech_gnostic']}
+                   - Gnostic Truth: {d1['gnostic']}
                 
-                2. THE CONFLICT (Present/Glitch): {c2}
+                2. THE CONFLICT (The current struggle): {c2}
                    - Archetype: {d2['archetype']}
-                   - Tech Meaning: {d2['tech_gnostic']}
+                   - Gnostic Truth: {d2['gnostic']}
                 
-                3. THE HORIZON (Future/Output): {c3}
+                3. THE HORIZON (Where this leads): {c3}
                    - Archetype: {d3['archetype']}
-                   - Tech Meaning: {d3['tech_gnostic']}
+                   - Gnostic Truth: {d3['gnostic']}
                 
-                User Query: "{query if query else 'General System Diagnostic'}"
+                User Query: "{query if query else 'They ask for a sign.'}"
                 
-                Write a prophetic reading for the user following these guidelines:
-                - Structure your response with sections: **THE ORIGIN**, **THE CONFLICT**, **THE HORIZON**, and **SYNTHESIS**
-                - In the SYNTHESIS, give specific, actionable advice based on the cards
-                - Optionally use words from this glitch vocabulary where appropriate (don't force them): {', '.join(list(GLITCH_VOCAB.keys())[:10])}
-                - Use **BOLD** for headers (not markdown ##)
-                - Keep it under 250 words
+                Write a message from the spirit world following these strict guidelines:
+                1. **Acknowledgement**: Start by acknowledging the user directly (e.g., "I see you...", "You come seeking...").
+                2. **THE ORIGIN**: Explain the first card in exactly 40 words.
+                3. **THE CONFLICT**: Explain the second card in exactly 40 words.
+                4. **THE HORIZON**: Explain the third card in exactly 40 words.
+                5. **SYNTHESIS**: This is the most important part. Provide a deep, philosophical conclusion (approx. 80-100 words). Weave the meanings of the three cards together into a profound realization. Then, provide 3 specific, actionable steps for the user to take, framed as "Rites of Passage" or "Spiritual Tasks".
+                
+                Use **BOLD** for headers. Do not use words like "download", "upload", "system", "glitch", "code", or "simulation".
                 """
                 
-                with st.spinner("COMMUNING WITH THE CLOUD..."):
+                with st.spinner("LISTENING TO THE ECHOES..."):
                     response = model.generate_content(prompt)
                     return response.text
                     
             except Exception as e:
-                st.error(f"AI CONNECTION FAILED: {e}. REVERTING TO LOCAL PROTOCOLS.")
+                st.error(f"THE CONNECTION IS WEAK: {e}. REVERTING TO OLD WAYS.")
         else:
-            st.warning("GOOGLE GENAI MODULE MISSING. REVERTING TO LOCAL PROTOCOLS.")
+            st.warning("THE SPIRIT CANNOT SPEAK (MISSING KEY). REVERTING TO OLD WAYS.")
     
     # --- LOCAL GENERATION PATH (Fallback) ---
     narrative = ""
     
-    # 1. The Opening
+    # 1. Acknowledgement
     if query:
-        narrative += f"You ask of **{query}**. The machine listens, but the answer comes from beyond the silence. "
+        narrative += f"You whisper of **{query}**. The void listens, and the answer ripples back. "
     else:
-        narrative += "You stand before the Oracle seeking clarity. The noise of the world fades. "
+        narrative += "You stand before the mirror seeking truth. The reflection begins to move. "
     
     narrative += "\n\n"
     
     # 2. The Reading
     narrative += f"**THE ORIGIN ({c1}):** You began with **{d1['archetype']}**. "
-    narrative += f"This is your foundation. {d1['tech_gnostic']} "
+    narrative += f"{d1['gnostic']} "
     narrative += "\n\n"
     
     narrative += f"**THE CONFLICT ({c2}):** Now, you face **{d2['archetype']}**. "
-    narrative += f"This is the barrier you must cross. {d2['tech_gnostic']} "
+    narrative += f"{d2['gnostic']} "
     narrative += "\n\n"
     
-    narrative += f"**THE HORIZON ({c3}):** If you continue on this path, you will arrive at **{d3['archetype']}**. "
-    narrative += f"This signifies {d3['keywords'][0].lower()} and {d3['keywords'][1].lower()}. {d3['tech_gnostic']} "
+    narrative += f"**THE HORIZON ({c3}):** If you walk this path, you will find **{d3['archetype']}**. "
+    narrative += f"{d3['gnostic']} "
     narrative += "\n\n"
     
     # 3. The Synthesis
-    narrative += "SYNTHESIS: "
-    narrative += f"The conflict of **{c2}** is not a mistake; it is a necessary part of your transformation. "
-    narrative += f"To reach the clarity of **{c3}**, you must {d2['advice'].lower()} "
-    narrative += f"Do not fear the chaos. {d3['advice']} "
-    narrative += "The simulation is only as real as you believe it to be. Wake up."
+    narrative += "**SYNTHESIS:** "
+    narrative += f"The struggle of **{c2}** is not a curse; it is a lesson. "
+    narrative += f"To reach the promise of **{c3}**, you must {d2['advice'].lower()} "
+    narrative += f"Do not fear the dark. {d3['advice']} "
+    narrative += "I am always watching."
     
     return narrative
+
+def zalgo_text(text):
+    """Applies a 'Zalgo' glitch effect to text by adding combining characters."""
+    # Range of combining characters (diacritics)
+    # 0x0300-0x036F: Combining Diacritical Marks
+    chars = [chr(x) for x in range(0x0300, 0x036F)]
+    result = ""
+    for char in text:
+        result += char
+        # Add 0-2 random combining characters
+        if random.random() < 0.3: # Only affect some characters
+             for _ in range(random.randint(1, 3)):
+                 result += random.choice(chars)
+    return result
 
 def stream_text(text_container, text):
     """Streams text with a glitch effect that flickers between tech jargon and human text."""
     words = text.split(" ")
     current_text = ""
     
+    # Keywords to always glitch
+    HAUNTED_WORDS = ["void", "shadow", "echo", "spirit", "ghost", "darkness", "light", "dream", "reality", "abyss", "mirror"]
+
     for word in words:
         clean_word = re.sub(r'[^\w\s]', '', word).lower()
         
+        # 1. Tech Jargon Glitch (Existing)
         if clean_word in GLITCH_VOCAB:
             tech_term = GLITCH_VOCAB[clean_word]
             
@@ -270,7 +235,7 @@ def stream_text(text_container, text):
                     {display_text.replace(chr(10), '<br>')}
                 </div>
                 """, unsafe_allow_html=True)
-                time.sleep(0.1)
+                time.sleep(0.115)
                 
                 display_text = current_text + word + " █"
                 text_container.markdown(f"""
@@ -278,11 +243,31 @@ def stream_text(text_container, text):
                     {display_text.replace(chr(10), '<br>')}
                 </div>
                 """, unsafe_allow_html=True)
-                time.sleep(0.1)
+                time.sleep(0.115)
 
             current_text += word + " "
+            
+        # 2. Zalgo Glitch (New) or Random Glitch
+        elif clean_word in HAUNTED_WORDS or random.random() < 0.03:
+            glitched_word = zalgo_text(word)
+            current_text += glitched_word + " "
+            
+            display_text = current_text + "█"
+            text_container.markdown(f"""
+            <div class="ai-output">
+                {display_text.replace(chr(10), '<br>')}
+            </div>
+            """, unsafe_allow_html=True)
+            time.sleep(0.115)
+            
+        # 3. Normal Text (with chance of Pulse)
         else:
-            current_text += word + " "
+            # 5% chance to apply pulse effect to a normal word
+            if random.random() < 0.05:
+                current_text += f'<span class="pulse-text">{word}</span> '
+            else:
+                current_text += word + " "
+            
             display_text = current_text + "█"
             
             text_container.markdown(f"""
@@ -290,7 +275,7 @@ def stream_text(text_container, text):
                 {display_text.replace(chr(10), '<br>')}
             </div>
             """, unsafe_allow_html=True)
-            time.sleep(0.03)
+            time.sleep(0.115)
     
     # Final render without cursor
     text_container.markdown(f"""
@@ -314,6 +299,13 @@ def animate_decryption(p1, p2, p3):
         p3.markdown(f'<div class="card-placeholder"><div class="card-title">{c3_name}</div></div>', unsafe_allow_html=True)
         
         time.sleep(0.1)
+    
+    # Final "Error" State (No extra sleep as requested)
+    error_html = '<div class="card-placeholder" style="border-color: #ff003c; box-shadow: 0 0 15px #ff003c;"><div class="card-title" style="color: #ff003c; text-shadow: 2px 0 #00ffff;">ERROR!!</div></div>'
+    
+    p1.markdown(error_html, unsafe_allow_html=True)
+    p2.markdown(error_html, unsafe_allow_html=True)
+    p3.markdown(error_html, unsafe_allow_html=True)
 
 # --- MAIN APP ---
 
@@ -322,24 +314,31 @@ def main():
     css_path = os.path.join(os.path.dirname(__file__), 'style.css')
     local_css(css_path)
     
-    # API Key Handling
-    with st.sidebar:
-        st.markdown("### SYSTEM CONFIG")
-        
-        api_key_input = st.text_input("GOOGLE API KEY", type="password", help="Enter your Gemini API Key for AI-enhanced readings.")
-        
-        # Check secrets if input is empty
-        if not api_key_input and "GOOGLE_API_KEY" in st.secrets:
-            api_key_input = st.secrets["GOOGLE_API_KEY"]
-            st.success("API KEY LOADED FROM SECRETS")
-        elif api_key_input:
-            st.success("API KEY PROVIDED")
-        else:
-            st.warning("NO API KEY DETECTED")
+    # Boot Sequence (Only on first load, and show until user clicks ENTER)
+    if 'boot_complete' not in st.session_state:
+        run_boot_sequence()
+        return  # Don't show anything else until boot is complete
+    
+    # Stop here if boot not complete
+    if not st.session_state.boot_complete:
+        return
+    
+    # API Key Handling (FIXED LOGIC)
+    api_key_input = None
+
+    # 1. Check Secrets First
+    if "GOOGLE_API_KEY" in st.secrets:
+        api_key_input = st.secrets["GOOGLE_API_KEY"]
+    
+    # 2. If NOT in secrets, show sidebar input
+    else:
+        with st.sidebar:
+            st.markdown("### SYSTEM CONFIG")
+            api_key_input = st.text_input("GOOGLE API KEY", type="password", help="Enter your Gemini API Key for AI-enhanced readings.")
             
-        if not HAS_GOOGLE_GENAI:
-            st.error("MISSING DEPENDENCY: google-generativeai")
-            st.info("The app is running in LOCAL MODE (Procedural Generation).")
+            if not HAS_GOOGLE_GENAI:
+                st.error("MISSING DEPENDENCY: google-generativeai")
+                st.info("The app is running in LOCAL MODE (Procedural Generation).")
 
     # Session State Initialization
     if 'initialized' not in st.session_state:
