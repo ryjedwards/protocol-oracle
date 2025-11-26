@@ -57,6 +57,23 @@ SUCCESS_MESSAGES = [
     "REALITY TUNNEL STABILIZED."
 ]
 
+def validate_card_library():
+    """Validates all cards have required fields."""
+    try:
+        from card_library import CARD_LIBRARY
+        
+        required_fields = ['archetype', 'gnostic', 'advice']
+        total_cards = len(CARD_LIBRARY)
+        valid_cards = 0
+        
+        for card_name, card_data in CARD_LIBRARY.items():
+            if all(field in card_data for field in required_fields):
+                valid_cards += 1
+        
+        return valid_cards, total_cards, valid_cards == total_cards
+    except Exception as e:
+        return 0, 0, False
+
 def preload_card_images():
     """Preloads all card images into session state during boot."""
     assets_dir = os.path.join(os.path.dirname(__file__), 'assets/cards')
@@ -112,14 +129,6 @@ def run_boot_sequence():
         else:
             messages.append(("green", msg))
     
-    # Asset Preloading Step (Always green)
-    messages.append(("green", "PRELOADING CARD_ASSETS..."))
-    
-    # Final Step: Success
-    success_msg = random.choice(SUCCESS_MESSAGES)
-    messages.append(("white", success_msg))
-    messages.append(("white", "> SYSTEM READY."))
-    
     # Display messages one by one (console log style)
     accumulated_html = ""
     
@@ -141,16 +150,66 @@ def run_boot_sequence():
             unsafe_allow_html=True
         )
         
-        # Preload assets when we hit that message
-        if "PRELOADING CARD_ASSETS" in msg:
-            st.session_state.preloaded_images = preload_card_images()
-        
         time.sleep(random.uniform(0.2, 0.7))
+    
+    # Card Validation Step
+    accumulated_html += '<div class="boot-text-green">> VALIDATING CARD_DATABASE...</div>'
+    console_container.markdown(
+        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+        unsafe_allow_html=True
+    )
+    time.sleep(0.3)
+    
+    valid_cards, total_cards, validation_success = validate_card_library()
+    
+    if validation_success:
+        accumulated_html += f'<div class="boot-text-green">> [{valid_cards}/{total_cards} CARDS OK]</div>'
+    else:
+        accumulated_html += f'<div class="boot-text-red">[ERROR]: CARD_DATABASE_CORRUPTED [{valid_cards}/{total_cards}]</div>'
+    
+    console_container.markdown(
+        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+        unsafe_allow_html=True
+    )
+    time.sleep(0.5)
+    
+    # Asset Preloading Step with Progress
+    accumulated_html += '<div class="boot-text-green">> PRELOADING CARD_ASSETS...</div>'
+    console_container.markdown(
+        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+        unsafe_allow_html=True
+    )
+    time.sleep(0.3)
+    
+    st.session_state.preloaded_images = preload_card_images()
+    loaded_count = len(st.session_state.preloaded_images)
+    
+    if loaded_count > 0:
+        accumulated_html += f'<div class="boot-text-green">> [{loaded_count} ASSETS LOADED]</div>'
+    else:
+        accumulated_html += '<div class="boot-text-red">[WARNING]: NO_ASSETS_FOUND</div>'
+    
+    console_container.markdown(
+        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+        unsafe_allow_html=True
+    )
+    time.sleep(0.5)
+    
+    # Final Step: Success
+    success_msg = random.choice(SUCCESS_MESSAGES)
+    accumulated_html += f'<div class="boot-text-white">> {success_msg}</div>'
+    accumulated_html += '<div class="boot-text-white">> SYSTEM READY.</div>'
+    
+    console_container.markdown(
+        f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
+        unsafe_allow_html=True
+    )
+    time.sleep(0.5)
     
     # Clear console after displaying all messages
     console_container.empty()
     
-    # Display final console with ENTER button
+    # Display final console with ENTER button (only if validation passed)
     st.markdown(
         f'<div style="font-family: monospace; line-height: 1.8;">{accumulated_html}</div>',
         unsafe_allow_html=True
@@ -158,9 +217,18 @@ def run_boot_sequence():
     
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Center the button
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        if st.button("[ ENTER ORACLE ]", key="boot_enter"):
-            st.session_state.boot_complete = True
-            st.rerun()
+    # Show button only if validation succeeded
+    if validation_success:
+        col1, col2, col3 = st.columns([1, 1, 1])
+        with col2:
+            if st.button("[ ENTER ORACLE ]", key="boot_enter"):
+                st.session_state.boot_complete = True
+                st.rerun()
+    else:
+        # Show error message instead of button
+        st.markdown(
+            '<div class="boot-text-red" style="text-align: center; margin-top: 20px;">'
+            'FATAL: SYSTEM INTEGRITY COMPROMISED. CONTACT ADMINISTRATOR.'
+            '</div>',
+            unsafe_allow_html=True
+        )
