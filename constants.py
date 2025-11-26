@@ -74,3 +74,11 @@ POSITIONS = [
     {"name": "THE CONFLICT", "desc": "The Glitch / Present"},
     {"name": "THE HORIZON", "desc": "Computed Output / Future"}
 ]
+
+SYSTEM_ALERTS = [
+    "WARNING: Reality buffer overflow.",
+    "ALERT: Non-Euclidean geometry detected.",
+    "NOTICE: Archon gaze felt in sector 4.",
+    "SYSTEM: Karma cleaner running...",
+    "ERROR: User ego too large for bandwidth."
+]

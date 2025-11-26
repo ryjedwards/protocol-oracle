@@ -1,498 +1,217 @@
-/* PROTOCOL: ORACLE_v1 STYLESHEET */
+/* PROTOCOL: ORACLE_v1 STYLESHEET_OPTIMIZED_V2 */
 
 @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-/* GLOBAL RESET & TERMINAL BASE */
+/* --- CORE TERMINAL AESTHETICS --- */
 .stApp {
     background-color: #000000;
-    /* Eerie Glitch Background */
     background-image:
-        radial-gradient(circle at 50% 50%, rgba(0, 20, 0, 0.1), rgba(0, 0, 0, 0.9)),
+        radial-gradient(circle at 50% 50%, rgba(0, 20, 0, 0.2), rgba(0, 0, 0, 0.95)),
         repeating-linear-gradient(0deg, transparent, transparent 2px, #001100 2px, #001100 4px);
     background-size: 100% 100%, 100% 4px;
     color: #39ff14;
     font-family: 'VT323', monospace;
-    overflow-x: hidden;
 }
 
-/* FLICKER ANIMATION */
-@keyframes flicker {
-    0% {
-        opacity: 0.97;
-    }
-
-    5% {
-        opacity: 0.95;
-    }
-
-    10% {
-        opacity: 0.9;
-    }
-
-    15% {
-        opacity: 0.95;
-    }
-
-    20% {
-        opacity: 0.99;
-    }
-
-    50% {
-        opacity: 0.95;
-    }
-
-    55% {
-        opacity: 0.9;
-    }
-
-    100% {
-        opacity: 0.97;
-    }
-}
-
-.stApp {
-    animation: flicker 6s infinite;
-}
-
-/* SCANLINE EFFECT OVERLAY */
+/* --- CRT & GLITCH EFFECTS --- */
 .scanlines {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(to bottom,
-            rgba(255, 255, 255, 0),
-            rgba(255, 255, 255, 0) 50%,
-            rgba(0, 0, 0, 0.3) 50%,
-            rgba(0, 0, 0, 0.3));
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
     background-size: 100% 4px;
     pointer-events: none;
-    z-index: 9999;
-    opacity: 0.4;
+    z-index: 9998;
+    animation: scanline-scroll 10s linear infinite;
 }
 
-/* NOISE OVERLAY */
-.stApp::before {
-    content: "";
+@keyframes scanline-scroll {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 100%; }
+}
+
+/* VIGNETTE OVERLAY */
+.vignette {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: radial-gradient(circle, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 100%);
     pointer-events: none;
-    z-index: 0;
-    opacity: 0.15;
-    animation: noise-shift 0.2s infinite;
+    z-index: 9997;
 }
 
-@keyframes noise-shift {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    10% {
-        transform: translate(-5%, -5%);
-    }
-
-    20% {
-        transform: translate(-10%, 5%);
-    }
-
-    30% {
-        transform: translate(5%, -10%);
-    }
-
-    40% {
-        transform: translate(-5%, 15%);
-    }
-
-    50% {
-        transform: translate(-10%, 5%);
-    }
-
-    60% {
-        transform: translate(15%, 0);
-    }
-
-    70% {
-        transform: translate(0, 10%);
-    }
-
-    80% {
-        transform: translate(-15%, 0);
-    }
-
-    90% {
-        transform: translate(10%, 5%);
-    }
-
-    100% {
-        transform: translate(5%, 0);
-    }
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-p,
-label {
+/* --- TYPOGRAPHY & INPUTS --- */
+h1, h2, h3, p, label, .stMarkdown {
     color: #39ff14 !important;
-    font-family: 'VT323', monospace !important;
-    text-shadow: 0 0 4px rgba(57, 255, 20, 0.6);
-    position: relative;
-    z-index: 10;
+    text-shadow: 0 0 5px rgba(57, 255, 20, 0.4);
 }
 
-/* Ensure main content sits above background effects */
-.block-container {
-    position: relative;
-    z-index: 10;
-}
-
-/* BOOT SEQUENCE STYLES */
-.boot-text-white {
-    color: #ffffff !important;
-    font-size: 1.2rem;
-    font-family: 'Share Tech Mono', monospace;
-    text-shadow: 0 0 5px #ffffff;
-}
-
-.boot-text-green {
+/* Custom Input Styling */
+input[type="text"], input[type="password"] {
+    background-color: #050505 !important;
     color: #39ff14 !important;
-    font-size: 1.2rem;
-    font-family: 'Share Tech Mono', monospace;
-    text-shadow: 0 0 10px #39ff14;
-}
-
-.boot-text-red {
-    color: #ff003c !important;
-    font-size: 1.5rem;
-    font-family: 'Share Tech Mono', monospace;
-    text-shadow: 2px 2px 0px #00ffff, -2px -2px 0px #ff003c;
-    animation: glitch-text 0.2s infinite;
-}
-
-@keyframes glitch-text {
-    0% {
-        transform: translate(0)
-    }
-
-    20% {
-        transform: translate(-2px, 2px)
-    }
-
-    40% {
-        transform: translate(-2px, -2px)
-    }
-
-    60% {
-        transform: translate(2px, 2px)
-    }
-
-    80% {
-        transform: translate(2px, -2px)
-    }
-
-    100% {
-        transform: translate(0)
-    }
-}
-
-/* BUTTON STYLING */
-div.stButton>button {
-    background-color: #000000 !important;
-    color: #39ff14 !important;
-    border: 2px solid #39ff14 !important;
-    border-radius: 0px !important;
+    border: 1px solid #39ff14 !important;
     font-family: 'Share Tech Mono', monospace !important;
-    font-size: 24px !important;
-    padding: 10px 24px !important;
-    text-transform: uppercase;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 10px #39ff14;
+    border-radius: 0 !important;
+}
+
+/* --- GLOW AND FLICKER CLASSES --- */
+
+/* Base Glow effect for all major neon elements */
+.neon-glow {
+    text-shadow: 0 0 7px #39ff14, 0 0 10px #39ff14, 0 0 15px rgba(57, 255, 20, 0.7);
+    animation: subtle-glow 3s infinite alternate;
+}
+
+@keyframes subtle-glow {
+    0% { opacity: 1; }
+    100% { opacity: 0.95; }
+}
+
+/* Intense flicker for log entries and headers */
+.flicker-text {
+    animation: flicker 4s linear infinite;
+}
+
+@keyframes flicker {
+    0%, 19.999%, 22%, 62.999%, 64%, 69.999%, 71%, 100% {
+        opacity: 0.99;
+        text-shadow: 0 0 1px #39ff14;
+    }
+    20%, 21.999%, 63%, 63.999%, 70%, 70.999% {
+        opacity: 0.8;
+        text-shadow: none;
+    }
+}
+
+/* Specific class for the logo container */
+.boot-logo-container {
+    padding: 20px 0;
+    margin-bottom: 20px;
+    /* Apply a deep red/cyan channel shift on hover for intense digital corruption */
+    transition: filter 0.2s;
+}
+
+.boot-logo-container:hover {
+    filter: hue-rotate(180deg) saturate(200%) contrast(1.1);
+}
+
+/* --- 3D HOLOGRAPHIC CARDS (THE WOW FACTOR) --- */
+.card-container {
+    perspective: 1000px; /* Creates the 3D space */
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.card-frame {
+    width: 20vw;
+    min-width: 200px;
+    transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.6s;
+    transform-style: preserve-3d;
+    border: 1px solid #39ff14;
+    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
     position: relative;
-    z-index: 2;
+    background: rgba(0, 10, 0, 0.9);
 }
 
-div.stButton>button:hover {
-    background-color: #39ff14 !important;
-    color: #000000 !important;
-    box-shadow: 0 0 20px #39ff14;
-    cursor: pointer;
-    text-shadow: none;
+.card-frame:hover {
+    transform: rotateX(10deg) rotateY(-10deg) scale(1.05) translateZ(20px);
+    box-shadow: -10px 10px 20px rgba(57, 255, 20, 0.4);
+    border-color: #ff003c;
+    z-index: 100;
 }
 
-div.stButton>button:active {
-    transform: scale(0.98);
+/* Image inside the frame */
+.card-frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    filter: sepia(100%) hue-rotate(50deg) saturate(300%) contrast(1.2); /* Matrix Green Filter */
+    transition: filter 0.3s;
 }
 
-/* CARD PLACEHOLDER STYLING */
+.card-frame:hover img {
+    filter: none; /* Reveal true colors on hover */
+}
+
+/* --- PLACEHOLDERS --- */
 .card-placeholder {
     border: 2px dashed #39ff14;
-    background-color: rgba(0, 10, 0, 0.8);
-    height: 400px;
+    background-color: rgba(0, 15, 0, 0.5);
+    height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    margin-bottom: 20px;
-    box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
-    position: relative;
-    z-index: 2;
-    transition: all 0.1s ease;
+    box-shadow: inset 0 0 30px rgba(57, 255, 20, 0.1);
+    animation: pulse-border 2s infinite;
 }
 
-/* JITTER ANIMATION FOR CARDS */
-@keyframes jitter {
-    0% {
-        transform: translate(0, 0);
-    }
-
-    25% {
-        transform: translate(-2px, 2px);
-    }
-
-    50% {
-        transform: translate(2px, -2px);
-    }
-
-    75% {
-        transform: translate(-2px, -2px);
-    }
-
-    100% {
-        transform: translate(0, 0);
-    }
+@keyframes pulse-border {
+    0% { border-color: #39ff14; opacity: 0.7; }
+    50% { border-color: #ffffff; opacity: 1; }
+    100% { border-color: #39ff14; opacity: 0.7; }
 }
 
-/* GLOW PULSE ANIMATION */
-@keyframes glow-pulse {
-    0% {
-        box-shadow: 0 0 5px #39ff14;
-        filter: brightness(1);
-    }
-
-    100% {
-        box-shadow: 0 0 25px #39ff14, 0 0 10px #39ff14;
-        filter: brightness(1.3);
-    }
-}
-
-.card-placeholder:hover {
-    animation: jitter 0.2s infinite;
-    border-color: #ff003c;
-    box-shadow: 0 0 15px #ff003c;
-    cursor: pointer;
-}
-
-/* IMAGE HOVER JITTER & GLOW */
-img:hover {
-    animation: jitter 0.2s infinite, glow-pulse 0.8s infinite alternate;
-    border: 1px solid #39ff14;
-    cursor: pointer;
-}
-
-.card-title {
-    font-size: 2rem;
+/* --- UI ELEMENTS --- */
+div.stButton > button {
+    background: transparent !important;
+    border: 2px solid #39ff14 !important;
+    color: #39ff14 !important;
+    font-family: 'Share Tech Mono', monospace !important;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    text-align: center;
+    font-size: 1.2rem !important;
+    padding: 10px 30px !important;
+    transition: all 0.2s;
+    box-shadow: 0 0 5px #39ff14;
 }
 
-.position-label {
-    font-size: 1.2rem;
-    color: #ffb000 !important;
-    /* Amber for contrast */
-    text-shadow: 0 0 5px #ffb000;
-    margin-bottom: 10px;
-    text-transform: uppercase;
-    border-bottom: 1px solid #ffb000;
-    display: inline-block;
+div.stButton > button:hover {
+    background: #39ff14 !important;
+    color: #000000 !important;
+    box-shadow: 0 0 25px #39ff14;
+    transform: scale(1.02);
 }
 
-/* AI OUTPUT BOX */
+/* --- AI OUTPUT TERMINAL --- */
 .ai-output {
-    border: 1px solid #39ff14;
-    padding: 20px;
-    background-color: rgba(0, 20, 0, 0.85);
+    border-left: 4px solid #39ff14;
+    padding: 15px 25px;
+    background: rgba(0, 20, 0, 0.6);
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
     line-height: 1.6;
     margin-top: 30px;
-    border-left: 5px solid #39ff14;
     position: relative;
-    z-index: 2;
 }
 
-/* FOOTER */
-.footer-link {
-    text-align: center;
-    margin-top: 50px;
-    font-size: 1.2em;
+/* NEW: Subtle H3 styling for oracle output headers */
+.ai-output h3 {
+    color: #ff003c !important; /* Use the accent red for emphasis */
+    font-size: 1.25rem !important; /* Slightly larger than the base 1.1rem */
+    margin-top: 1.5rem !important;
+    margin-bottom: 0.5rem !important;
+    text-shadow: none !important;
+}
+
+.ai-output::before {
+    content: ">> TRANSMISSION_RECEIVED:";
+    display: block;
+    font-size: 0.8rem;
+    color: #ff003c;
+    margin-bottom: 10px;
     opacity: 0.8;
-    border: 1px solid #333;
-    padding: 15px 30px;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-    transition: all 0.3s ease;
-    color: #39ff14;
-    background-color: #050505;
-    position: relative;
-    z-index: 2;
 }
 
-.footer-link:hover {
-    border-color: #39ff14;
-    opacity: 1.0;
-    box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+/* --- CRT OFF ANIMATION (For Reboot) --- */
+@keyframes turn-off {
+    0% { transform: scale(1, 1.3) translate3d(0, 0, 0); filter: brightness(1); opacity: 1; }
+    60% { transform: scale(1, 0.001) translate3d(0, 0, 0); filter: brightness(10); }
+    100% { animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06); transform: scale(0, 0.001) translate3d(0, 0, 0); opacity: 0; }
 }
 
-.footer-link a {
-    color: #ffb000 !important;
-    text-decoration: none;
-}
-
-/* TEXT PULSE ANIMATION */
-@keyframes text-pulse {
-    0% {
-        text-shadow: 0 0 2px #39ff14;
-        opacity: 0.8;
-    }
-
-    50% {
-        text-shadow: 0 0 15px #39ff14, 0 0 5px #ffffff;
-        opacity: 1;
-    }
-
-    100% {
-        text-shadow: 0 0 2px #39ff14;
-        opacity: 0.8;
-    }
-}
-
-.pulse-text {
-    animation: text-pulse 2s infinite;
-    color: #ffffff !important;
-}
-
-/* ============================================ */
-/* CARD FADE-IN STAGGER EFFECT */
-/* ============================================ */
-
-@keyframes fade-in-card {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Stagger card appearance (left to right) */
-div[data-testid="column"]:nth-child(1) {
-    animation: fade-in-card 0.4s ease-out;
-}
-
-div[data-testid="column"]:nth-child(2) {
-    animation: fade-in-card 0.4s ease-out 0.15s;
-    animation-fill-mode: backwards;
-}
-
-div[data-testid="column"]:nth-child(3) {
-    animation: fade-in-card 0.4s ease-out 0.3s;
-    animation-fill-mode: backwards;
-}
-
-/* ============================================ */
-/* RESPONSIVE DESIGN FOR MOBILE */
-/* ============================================ */
-
-/* Tablet and below */
-@media (max-width: 1024px) {
-    .card-title {
-        font-size: 1.5rem;
-    }
-
-    .position-label {
-        font-size: 1rem;
-    }
-}
-
-/* Mobile devices */
-@media (max-width: 768px) {
-
-    /* Force columns to stay horizontal and shrink */
-    div[data-testid="column"] {
-        flex: 1 1 33% !important;
-        min-width: 0 !important;
-        padding: 0 4px !important;
-    }
-
-    /* Shrink card placeholders */
-    .card-placeholder {
-        height: auto !important;
-        min-height: 120px;
-        padding: 8px;
-    }
-
-    /* Smaller card text */
-    .card-title {
-        font-size: 0.7rem !important;
-        letter-spacing: 1px;
-    }
-
-    /* Smaller position labels */
-    .position-label {
-        font-size: 0.7rem !important;
-        margin-bottom: 5px;
-    }
-
-    /* Adjust AI output for mobile */
-    .ai-output {
-        font-size: 0.9rem;
-        padding: 12px;
-        line-height: 1.4;
-    }
-
-    /* Smaller button on mobile */
-    div.stButton>button {
-        font-size: 16px !important;
-        padding: 8px 16px !important;
-    }
-
-    /* Smaller boot text on mobile */
-    .boot-text-white,
-    .boot-text-green {
-        font-size: 0.9rem !important;
-    }
-
-    .boot-text-red {
-        font-size: 1.1rem !important;
-    }
-}
-
-/* Very small phones */
-@media (max-width: 480px) {
-    .card-title {
-        font-size: 0.6rem !important;
-        letter-spacing: 0.5px;
-    }
-
-    .position-label {
-        font-size: 0.6rem !important;
-    }
-
-    .card-placeholder {
-        min-height: 100px;
-    }
+.crt-off {
+    animation: turn-off 0.55s cubic-bezier(0.23, 1, 0.32, 1);
+    animation-fill-mode: forwards;
 }
